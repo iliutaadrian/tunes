@@ -1,0 +1,15 @@
+{
+  "token": "CHANGE_ME",
+  "port": 8792,
+  "data_dir": "../data",
+  "music_dir": "/DATA/Media/Music",
+  "library_dir": "/DATA/Media_media_media/Media/Music",
+  "download_owner": [1000, 1000],
+  "beets_db": "/DATA/AppData/beets/config/musiclibrary.blb",
+  "pinchflat_db": "/DATA/AppData/pinchflat/db/pinchflat.db",
+  "folders": ["Electro", "long nights", "nostalgia", "misc", "recommendations"],
+  "import_cmd": ["/DATA/Media/Music/music-tools/sync-music.sh", "--no-index"],
+  "auto_import_after": 600,
+  "seeds_per_round": 40,
+  "queue_size": 50
+}

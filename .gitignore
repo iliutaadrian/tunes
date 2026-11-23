@@ -1,0 +1,6 @@
+data/
+server/tunes.json
+__pycache__/
+*.pyc
+.DS_Store
+*.bak-*

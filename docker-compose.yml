@@ -1,0 +1,45 @@
+# Tunes on the homelab. Paths inside the container are the same as on the host, so tunes.json and
+# the library import script (sync-music.sh) read the same on both sides.
+name: tunes
+
+services:
+  tunes:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    image: tunes:local
+    container_name: tunes
+    network_mode: host          # the import script talks to Plex and Pinchflat on localhost
+    restart: unless-stopped
+    mem_limit: 1g
+    volumes:
+      - ./data:/app/data
+      - ./server/tunes.json:/app/server/tunes.json:ro
+      - /DATA/Media/Music:/DATA/Media/Music                                        # downloads land here
+      - /DATA/Media_media_media/Media/Music:/DATA/Media_media_media/Media/Music    # the library Plex plays
+      - /DATA/AppData/beets/config:/DATA/AppData/beets/config:ro
+      - /DATA/AppData/pinchflat/db:/DATA/AppData/pinchflat/db:ro
+      - "/DATA/AppData/plex/config/Library/Application Support/Plex Media Server:/DATA/AppData/plex/config/Library/Application Support/Plex Media Server:ro"
+      - /var/run/docker.sock:/var/run/docker.sock                                  # the import runs beets with docker exec
+
+# Read by CasaOS for the dashboard tile. Plain docker compose ignores it.
+x-casaos:
+  architectures:
+    - amd64
+  main: tunes
+  author: iliutaadrian
+  developer: iliutaadrian
+  category: Media
+  icon: https://cdn.jsdelivr.net/gh/iliutaadrian/tunes@main/server/web/icon.svg
+  thumbnail: https://cdn.jsdelivr.net/gh/iliutaadrian/tunes@main/server/web/icon.svg
+  title:
+    en_us: Tunes
+  tagline:
+    en_us: Find new music, play your own
+  description:
+    en_us: >-
+      Personal music recommender and player. Pick a mood, listen, Keep or Skip.
+      Kept tracks download by themselves and land in the Plex library.
+  index: /
+  port_map: "8792"
+  scheme: http

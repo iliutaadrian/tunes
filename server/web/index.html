@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1012">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Tunes</title>
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tunes">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="#/"><span class="mark" aria-hidden="true">♪</span>Tunes</a>
+  <div class="grow"></div>
+  <div id="statusBar" class="status" aria-live="polite"></div>
+</header>
+<nav class="nav" aria-label="Sections">
+  <a href="#/" data-nav="listen">Listen</a>
+  <a href="#/library" data-nav="library">Library</a>
+  <a href="#/moods" data-nav="moods">Moods</a>
+  <a href="#/kept" data-nav="kept">Kept</a>
+  <a href="#/skipped" data-nav="skipped">Skipped</a>
+</nav>
+<main id="view" tabindex="-1"></main>
+<script src="app.js"></script>
+</body>
+</html>

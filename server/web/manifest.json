@@ -1,0 +1,19 @@
+{
+  "name": "Tunes",
+  "short_name": "Tunes",
+  "description": "Listen to recommended tracks before they reach the music library.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0f1012",
+  "theme_color": "#0f1012",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

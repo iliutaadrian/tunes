@@ -1,0 +1,6 @@
+data
+tests
+server/tunes.json
+server/tunes.json.bak-*
+**/__pycache__
+.git
