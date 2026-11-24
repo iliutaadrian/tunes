@@ -247,6 +247,7 @@ class App:
         self.state_path = os.path.join(cfg["data_dir"], "state.db")
         self.settings_path = os.path.join(cfg["data_dir"], "settings.json")
         self.settings_lock = threading.Lock()
+        self.download_retry_waits = (10, 60)
         ytdlp = cfg.get("ytdlp") or ["yt-dlp"]
         self.ytdlp = [ytdlp] if isinstance(ytdlp, str) else ytdlp
         self.fetch_mix = fetch_mix or (lambda vid: ytdlp_mix(self.ytdlp, vid))
@@ -585,7 +586,15 @@ class App:
 
     def ytdlp_download(self, vid, folder):
         """Download into the folder as yt-dlp sees it, and answer with the path as this process sees it."""
-        path = ytdlp_audio(self.ytdlp, vid, os.path.join(self.ytdlp_music_dir, folder))
+        for wait in (*self.download_retry_waits, None):  # YouTube refuses a download now and then (403): try again
+            try:
+                path = ytdlp_audio(self.ytdlp, vid, os.path.join(self.ytdlp_music_dir, folder))
+                break
+            except RuntimeError as e:
+                if wait is None:
+                    raise
+                print(f"download {vid}: {str(e)[-120:]}, again in {wait} s", file=sys.stderr, flush=True)
+                time.sleep(wait)
         if path.startswith(self.ytdlp_music_dir):
             path = self.music_dir + path[len(self.ytdlp_music_dir):]
         return path
