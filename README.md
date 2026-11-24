@@ -1,16 +1,63 @@
-# Tunes
+<div align="center">
 
-A personal music recommender. You pick a mood, it asks YouTube what plays next to your seeds, you listen and press Keep or Skip.
+# 🎧 Tunes
 
-- **Mood**: a named set of seeds. Seeds are a library playlist, pasted YouTube links, and the tracks you keep in that mood.
-- **Round**: reads the YouTube Mix of each seed, then ranks tracks that several seeds agree on.
-- **Library**: plays the music you already own, by playlist, newest first, with shuffle. One button saves the playing track to the device.
-- **Settings**: the last mood, the last playlist and shuffle are kept in `data/settings.json` on the server, so every device opens the same way. Only the token stays in the browser.
-- **Keep**: downloads the audio into a playlist folder. **Skip**: never offered again.
+**A personal music recommender and player. Pick a mood, listen, press Keep or Skip.**
 
-No dependencies beyond Python 3.11, `yt-dlp` and `ffmpeg`. No build step. A Docker image is included.
+*YouTube's own radio as the source, a ranking you can read, one Python file on your own server.*
+
+<br>
+
+<img src="docs/listen.jpg" width="820" alt="Listen page: mood chips with the number of waiting tracks, the YouTube player, Keep, Skip and Later buttons, a box that lists the seeds behind the track, and the queue on the right">
+
+*`K` keep · `S` skip · `L` later. The box under the player names the seeds that led to this track.*
+
+</div>
+
+---
+
+## Why this exists
+
+Three honest reasons:
+
+1. **I want to hear a track before it reaches my library.** A recommendation list is only a list of titles. Here every track plays first. Keep downloads it into a playlist folder. Skip means it is never offered again.
+2. **I did not want a model or an account in the loop.** Every YouTube video has an auto-generated Mix, YouTube's own radio for that track. Tunes reads the Mix of each seed and ranks the tracks that several seeds agree on. The formula is short and it is written below. Each track shows the seeds that voted for it.
+3. **It should run on a small home server.** The server is one Python file on the standard library, with one SQLite file for state. The only other tools are `yt-dlp` and `ffmpeg`. The web app is plain JavaScript with no build step.
+
+<div align="center">
+<img src="docs/library.jpg" width="760" alt="Library page: playlist chips with track counts, a player with cover art, shuffle, previous, play, next and save buttons, and a track list with a filter box">
+
+*The Library tab plays the music you already own, by playlist, with shuffle and a button that saves the track to this device.*
+</div>
+
+---
+
+## What it does
+
+| | |
+|---|---|
+| 🎚 **Moods** | A mood is a named set of seeds: a library playlist, pasted YouTube links, and the tracks you keep in that mood. Each mood has its own queue and its own default folder for Keep. |
+| 🔁 **Rounds** | **New round** reads the YouTube Mix of each seed (up to `seeds_per_round`) and ranks the tracks that two or more seeds agree on. Rounds run in the background, one at a time. Mixes are cached, and each round samples the seeds in a new random order. |
+| 👂 **Listen, then decide** | The queue plays in an embedded YouTube player, best track first. **Keep** downloads the audio into the playlist folder you pick. **Skip** removes the track for good. **Later** moves on with no verdict. Keys: `K`, `S`, `L`. |
+| 💡 **Because you have** | Every track in the queue lists the seeds that recommended it, so you can see why it is there. |
+| ⬇️ **Downloads** | Kept tracks download one at a time with `yt-dlp`, as m4a with metadata and cover embedded. A download is skipped when the disk has less than 5 GB free. The header shows how many downloads are running. |
+| 📥 **Library import** | With `import_cmd` set, a **Send to Plex** button runs your import script for the downloaded tracks. With `auto_import_after` set, it runs by itself after downloads have been quiet for that many seconds. |
+| 📚 **Library player** | Plays the music you already own (read from the beets database): by playlist or all of it, newest first, with shuffle, a filter box, cover art and seek. It answers to media keys. Keys: `N` next, `P` previous, `space` play or pause. One button saves the playing track to the device. |
+| 🗂 **Kept and Skipped** | Two history pages. Kept shows the mood, the folder and the download state of each track. Skipped has a **Back to queue** button for each track. A channel with only skips is ranked lower. |
+| ⚙️ **Settings on the server** | The last mood, the last playlist and shuffle are kept in `data/settings.json` on the server, so every device opens the same way. Only the token stays in the browser. |
+| 📱 **Installable** | A web manifest and a service worker keep the app shell available, so the installed app opens at once (the service worker needs HTTPS or localhost). The API, audio and covers are never cached. |
+
+<div align="center">
+<img src="docs/moods.jpg" width="760" alt="Moods page: a list of moods with seed source, kept count, waiting count and time of the last round, each with New round and Listen buttons">
+
+*The Moods tab: where each mood gets its seeds, how many tracks wait, and when the last round ran.*
+</div>
+
+---
 
 ## Run
+
+No dependencies beyond Python 3.11, `yt-dlp` and `ffmpeg`. No build step. A Docker image is included.
 
 ```sh
 cp server/tunes.example.json server/tunes.json   # set a token and the paths
