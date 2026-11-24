@@ -191,6 +191,24 @@ class AppTest(unittest.TestCase):
         self.assertEqual(get("1?save&token=" + TOKEN)[2]["Content-Disposition"],
                          "attachment; filename=\"a - one.m4a\"; filename*=UTF-8''a%20-%20one.m4a")
 
+    def test_a_refused_download_is_tried_again(self):
+        self.app.download_retry_waits = (0, 0)
+        tries = []
+
+        def flaky(cmd, video, dest):
+            tries.append(video)
+            if len(tries) < 3:
+                raise RuntimeError("HTTP Error 403: Forbidden")
+            return os.path.join(dest, "song.m4a")
+        self.addCleanup(setattr, tunes, "ytdlp_audio", tunes.ytdlp_audio)
+        tunes.ytdlp_audio = flaky
+        self.assertTrue(self.app.ytdlp_download(vid(1), "misc").endswith("misc/song.m4a"))
+        self.assertEqual(len(tries), 3)
+        tries.clear()
+        tunes.ytdlp_audio = lambda *a: (_ for _ in ()).throw(RuntimeError("gone for good"))
+        with self.assertRaisesRegex(RuntimeError, "gone for good"):
+            self.app.ytdlp_download(vid(1), "misc")
+
     def test_import_starts_by_itself_after_downloads_go_quiet(self):
         self.app.cfg.update(import_cmd=["true"], auto_import_after=600)
         self.assertFalse(self.app.auto_import_due())                      # nothing downloaded
